@@ -2,7 +2,7 @@
 ##	analyzeDDM
 ##
 ##	Author: James McCann (mccannjb (at) gmail (dot) com)
-##      Written 01-2013
+##      Written 05-2013
 ##
 ##	The purpose of this script is to take one or more gridded,
 ##	average DDM output files corresponding to a split model 
@@ -12,11 +12,15 @@
 ##	Import PseudoNetCDF uamiv reader
 ##	Write method for importing DDM files
 ##	Iterate to import all files
-##	Create large array for all ozone sensitivities
+##	Create large dictionary for all ozone sensitivities
 ##	Create dictionary for array that links all sensitivites
 ##		to their given lat/lon
 
 from PseudoNetCDF.camxfiles.Memmaps import uamiv
+from collections import defaultdict
+import AnDDM
+import numpy as np
+import sys
 
 def importDDM(ddmFile,species,grp)
 # importDDM will import the given DDM average file using PseudoNetCDF
@@ -25,6 +29,10 @@ def importDDM(ddmFile,species,grp)
 #	species: the number of the species in question (eg. 05 for ozone)
 #	grp: group number
 	ddm = uamiv(ddmFile)
+	varList=[]
+	for sens in ddm.variables.keys():	# Create a list of desired sensitivities
+		if sens.startswith(grp+"E"):
+			varList.append(sens)
 	#TODO: Pull appropriate species sensitivites
 	#TODO: Create group array
 	#TODO: Add sensitivities to group array
@@ -44,6 +52,8 @@ def linkLocations(grpArray,locationFile,grp)
 
 ozoneSpecies = "05"	# This is the modeled species number of
 			# ozone for the simulation.
+
+
 
 #initialize large array
 #for each group:
