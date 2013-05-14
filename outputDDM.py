@@ -62,7 +62,7 @@ for opt,arg in opts:
 print 'Input file directory: {}'.format(inputdir)
 print 'Map file: {}'.format(mapfile)
 print 'Day of interest: {}'.format(doi)
-print 'Starting hour: {}'.format(starthour)
+print 'Starting hour: {} UTC'.format(starthour)
 print 'Number of groups: {}'.format(groups)
 print 'Averaging hour range: {}'.format(hrrange)
 
@@ -70,7 +70,9 @@ print 'Averaging hour range: {}'.format(hrrange)
 t_rows=240		# These values are the total rows and columns
 t_cols=279		# for the 12EUS1 domain, edit only if necessary
 
-cases = ['PITTSB_24HR']
+endhour=starthour+hrrange
+
+cases = ['NICK_12HR']
 species = "05"		# This is the modeled species number of
 			# ozone for the simulation.
 #####################
@@ -99,12 +101,12 @@ for case in cases:
 					sens=ddm.variables[key]
 					spatialAvg[newKey]=[avgSens(sens[hr,0],grdXs,grdYs) for hr in range(24)]
 	allCases[case]=spatialAvg
-output=open('PITTSB_AllDay_DDMavg.out','w')
-headers="Case,Sensitivity,"+','.join(['Hour {0:02d}'.format(hr) for hr in range(24)])+"\n"
-output.write(headers)
 for akey in sorted(allCases.iterkeys()):
+	output=open('{}_hrs{}-{}_DDMavg.out'.format(akey,starthour,endhour),'w')
+	headers="Case,Sensitivity,"+','.join(['Hour {0:02d}'.format(hr) for hr in range(24)])+"\n"
+	output.write(headers)
 	for key in sorted(allCases[akey].iterkeys()):
-		wstring = ",".join(['{0:10.3E}'.format(allCases['PITTSB_24HR'][key][hr]) for hr in range(24)])
+		wstring = ",".join(['{0:10.3E}'.format(allCases[akey][key][hr]) for hr in range(starthour,endhour+1)])
 		output.write("{},{},{}\n".format(akey,key,wstring))
-output.close()
+	output.close()
 	
